@@ -9,8 +9,12 @@ namespace AdventOfCode2020
     {
         static void Main()
         {
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "input.txt");
+            using var fileStream = File.OpenRead(path);
+            using var streamReader = new StreamReader(fileStream);
+
             //currently working on:
-            Day10.Part1();
+            Day10.Part1(streamReader);
         }
     }
 
@@ -24,12 +28,8 @@ namespace AdventOfCode2020
 
     public class Day2
     {
-        public static void Part1()
+        public static void Part1(StreamReader streamReader)
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "input.txt");
-            using var fileStream = File.OpenRead(path);
-            using var streamReader = new StreamReader(fileStream);
-
             var count = 0;
 
             string line;
@@ -133,8 +133,11 @@ namespace AdventOfCode2020
 
     public class Day10
     {
-        public static void Part1()
+        public static void Part1(StreamReader streamReader)
         {
+            var input = "16 10 15 5 1 11 7 19 6 12 4";
+
+            var adapters = input.Split(" ");
 
         }
     }
