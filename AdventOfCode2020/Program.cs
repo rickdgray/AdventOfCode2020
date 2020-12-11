@@ -21,8 +21,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            var day11 = new Day11();
-            day11.Part1(data);
+            Day12.Part1(data);
         }
     }
 
@@ -220,30 +219,16 @@ namespace AdventOfCode2020
 
     public class Day11
     {
-        public void Part1(List<string> data)
+        public static void Part1(List<string> data)
         {
             var rowCount = data.Count + 2;
             var colCount = data.First().Length + 2;
+            var directions = Enum
+                .GetValues(typeof(Direction))
+                .Cast<Direction>()
+                .ToList();
 
             var seatingChart = new Cell[rowCount, colCount];
-
-            //pad spaces around chairs
-            for (int i = 0; i < colCount; i++)
-            {
-                seatingChart[0, i] = Cell.Floor;
-            }
-            for (int i = 0; i < colCount; i++)
-            {
-                seatingChart[rowCount - 1, i] = Cell.Floor;
-            }
-            for (int i = 0; i < rowCount; i++)
-            {
-                seatingChart[i, 0] = Cell.Floor;
-            }
-            for (int i = 0; i < rowCount; i++)
-            {
-                seatingChart[i, colCount - 1] = Cell.Floor;
-            }
 
             for (int i = 0; i < rowCount - 2; i++)
             {
@@ -262,7 +247,6 @@ namespace AdventOfCode2020
 
             Cell[,] previousSeatingChart = null;
 
-            //start iterating
             while (!SeatingChartsAreEqual(rowCount, colCount, previousSeatingChart, seatingChart))
             {
                 previousSeatingChart = (Cell[,])seatingChart.Clone();
@@ -274,60 +258,111 @@ namespace AdventOfCode2020
                         if (previousSeatingChart[i, j] == Cell.Floor)
                             continue;
 
-                        var (leftI, leftJ) = GetAdjacentCell(i, j, Direction.Left);
-                        var left = previousSeatingChart[leftI, leftJ];
+                        var adjacentSeats = new List<Cell>();
 
-                        var (upLeftI, upLeftJ) = GetAdjacentCell(i, j, Direction.UpLeft);
-                        var upLeft = previousSeatingChart[upLeftI, upLeftJ];
+                        foreach (var direction in directions)
+                        {
+                            var (adjacentCellRow, adjacentCellCol) = GetAdjacentCell(i, j, direction);
+                            adjacentSeats.Add(previousSeatingChart[adjacentCellRow, adjacentCellCol]);
+                        }
 
-                        var (upI, upJ) = GetAdjacentCell(i, j, Direction.Up);
-                        var up = previousSeatingChart[upI, upJ];
-
-                        var (upRightI, upRightJ) = GetAdjacentCell(i, j, Direction.UpRight);
-                        var upRight = previousSeatingChart[upRightI, upRightJ];
-
-                        var (rightI, rightJ) = GetAdjacentCell(i, j, Direction.Right);
-                        var right = previousSeatingChart[rightI, rightJ];
-
-                        var (downRightI, downRightJ) = GetAdjacentCell(i, j, Direction.DownRight);
-                        var downRight = previousSeatingChart[downRightI, downRightJ];
-
-                        var (downI, downJ) = GetAdjacentCell(i, j, Direction.Down);
-                        var down = previousSeatingChart[downI, downJ];
-
-                        var (downLeftI, downLeftJ) = GetAdjacentCell(i, j, Direction.DownLeft);
-                        var downLeft = previousSeatingChart[downLeftI, downLeftJ];
-
-                        //if empty and all adjecent empty set full
                         if (previousSeatingChart[i, j] == Cell.Empty
-                            && left != Cell.Occupied
-                            && upLeft != Cell.Occupied
-                            && up != Cell.Occupied
-                            && upRight != Cell.Occupied
-                            && right != Cell.Occupied
-                            && downRight != Cell.Occupied
-                            && down != Cell.Occupied
-                            && downLeft != Cell.Occupied)
+                            && adjacentSeats.All(s => s != Cell.Occupied))
                         {
                             seatingChart[i, j] = Cell.Occupied;
                         }
-                        else if (previousSeatingChart[i, j] == Cell.Occupied)
+                        else if (previousSeatingChart[i, j] == Cell.Occupied
+                            && adjacentSeats.FindAll(s => s == Cell.Occupied).Count >= 4)
                         {
-                            var count = 0;
+                            seatingChart[i, j] = Cell.Empty;
+                        }
+                    }
+                }
+            }
 
-                            if (left == Cell.Occupied) count++;
-                            if (upLeft == Cell.Occupied) count++;
-                            if (up == Cell.Occupied) count++;
-                            if (upRight == Cell.Occupied) count++;
-                            if (right == Cell.Occupied) count++;
-                            if (downRight == Cell.Occupied) count++;
-                            if (down == Cell.Occupied) count++;
-                            if (downLeft == Cell.Occupied) count++;
+            var finalCount = 0;
+            for (int i = 0; i < rowCount; i++)
+            {
+                for (int j = 0; j < colCount; j++)
+                {
+                    if (seatingChart[i, j] == Cell.Occupied)
+                        finalCount++;
+                }
+            }
 
-                            if (count >= 4)
+            Console.WriteLine(finalCount);
+        }
+
+        public static void Part2(List<string> data)
+        {
+            var rowCount = data.Count + 2;
+            var colCount = data.First().Length + 2;
+            var directions = Enum
+                .GetValues(typeof(Direction))
+                .Cast<Direction>()
+                .ToList();
+
+            var seatingChart = new Cell[rowCount, colCount];
+
+            for (int i = 0; i < rowCount - 2; i++)
+            {
+                var seats = data[i].ToArray();
+                for (int j = 0; j < colCount - 2; j++)
+                {
+                    seatingChart[i + 1, j + 1] = (seats[j]) switch
+                    {
+                        '.' => Cell.Floor,
+                        'L' => Cell.Empty,
+                        '#' => Cell.Occupied,
+                        _ => throw new Exception("Invalid input"),
+                    };
+                }
+            }
+
+            Cell[,] previousSeatingChart = null;
+
+            while (!SeatingChartsAreEqual(rowCount, colCount, previousSeatingChart, seatingChart))
+            {
+                previousSeatingChart = (Cell[,])seatingChart.Clone();
+
+                for (int i = 0; i < rowCount; i++)
+                {
+                    for (int j = 0; j < colCount; j++)
+                    {
+                        if (previousSeatingChart[i, j] == Cell.Floor)
+                            continue;
+
+                        var adjacentSeats = new List<Cell>();
+
+                        foreach (var direction in directions)
+                        {
+                            var currentAdjacentCell = Cell.Floor;
+
+                            var adjacentCellRow = i;
+                            var adjacentCellCol = j;
+
+                            do
                             {
-                                seatingChart[i, j] = Cell.Empty;
-                            }
+                                (adjacentCellRow, adjacentCellCol) = GetAdjacentCell(adjacentCellRow, adjacentCellCol, direction);
+                                currentAdjacentCell = previousSeatingChart[adjacentCellRow, adjacentCellCol];
+                            } while (currentAdjacentCell == Cell.Floor
+                                && adjacentCellRow > 0
+                                && adjacentCellCol > 0
+                                && adjacentCellRow < rowCount - 1
+                                && adjacentCellCol < colCount - 1);
+
+                            adjacentSeats.Add(currentAdjacentCell);
+                        }
+
+                        if (previousSeatingChart[i, j] == Cell.Empty
+                            && adjacentSeats.All(s => s != Cell.Occupied))
+                        {
+                            seatingChart[i, j] = Cell.Occupied;
+                        }
+                        else if (previousSeatingChart[i, j] == Cell.Occupied
+                            && adjacentSeats.FindAll(s => s == Cell.Occupied).Count >= 5)
+                        {
+                            seatingChart[i, j] = Cell.Empty;
                         }
                     }
                 }
@@ -366,7 +401,7 @@ namespace AdventOfCode2020
             return true;
         }
 
-        public Tuple<int, int> GetAdjacentCell(int i, int j, Direction direction)
+        public static Tuple<int, int> GetAdjacentCell(int i, int j, Direction direction)
         {
             return direction switch
             {
@@ -377,37 +412,34 @@ namespace AdventOfCode2020
                 Direction.Right => Tuple.Create(i, j + 1),
                 Direction.DownRight => Tuple.Create(i + 1, j + 1),
                 Direction.Down => Tuple.Create(i + 1, j),
-                Direction.DownLeft => Tuple.Create(i + 1, j - 1)
+                Direction.DownLeft => Tuple.Create(i + 1, j - 1),
+                _ => throw new ArgumentException("Invalid Direction")
             };
         }
 
         public enum Cell
         {
-            Floor = -1,
-            Empty = 0,
-            Occupied = 1
+            Floor,
+            Empty,
+            Occupied
         }
 
         public enum Direction
         {
-            Left = 0,
-            UpLeft = 1,
-            LeftUp = 1,
-            Up = 2,
-            UpRight = 3,
-            RightUp = 3,
-            Right = 4,
-            DownRight = 5,
-            RightDown = 5,
-            Down = 6,
-            DownLeft = 7,
-            LeftDown = 7
+            Left,
+            UpLeft,
+            Up,
+            UpRight,
+            Right,
+            DownRight,
+            Down,
+            DownLeft
         }
     }
 
     public class Day12
     {
-        public static void Part1()
+        public static void Part1(List<string> data)
         {
             throw new NotImplementedException();
         }
