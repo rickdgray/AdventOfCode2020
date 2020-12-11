@@ -266,41 +266,40 @@ namespace AdventOfCode2020
             while (!SeatingChartsAreEqual(rowCount, colCount, previousSeatingChart, seatingChart))
             {
                 previousSeatingChart = (Cell[,])seatingChart.Clone();
-                TestPrint(rowCount, colCount, seatingChart);
 
                 for (int i = 0; i < rowCount; i++)
                 {
                     for (int j = 0; j < colCount; j++)
                     {
-                        if (seatingChart[i, j] == Cell.Floor)
-                            break;
+                        if (previousSeatingChart[i, j] == Cell.Floor)
+                            continue;
 
                         var (leftI, leftJ) = GetAdjacentCell(i, j, Direction.Left);
-                        var left = seatingChart[leftI, leftJ];
+                        var left = previousSeatingChart[leftI, leftJ];
 
                         var (upLeftI, upLeftJ) = GetAdjacentCell(i, j, Direction.UpLeft);
-                        var upLeft = seatingChart[upLeftI, upLeftJ];
+                        var upLeft = previousSeatingChart[upLeftI, upLeftJ];
 
                         var (upI, upJ) = GetAdjacentCell(i, j, Direction.Up);
-                        var up = seatingChart[upI, upJ];
+                        var up = previousSeatingChart[upI, upJ];
 
                         var (upRightI, upRightJ) = GetAdjacentCell(i, j, Direction.UpRight);
-                        var upRight = seatingChart[upRightI, upRightJ];
+                        var upRight = previousSeatingChart[upRightI, upRightJ];
 
                         var (rightI, rightJ) = GetAdjacentCell(i, j, Direction.Right);
-                        var right = seatingChart[rightI, rightJ];
+                        var right = previousSeatingChart[rightI, rightJ];
 
                         var (downRightI, downRightJ) = GetAdjacentCell(i, j, Direction.DownRight);
-                        var downRight = seatingChart[downRightI, downRightJ];
+                        var downRight = previousSeatingChart[downRightI, downRightJ];
 
                         var (downI, downJ) = GetAdjacentCell(i, j, Direction.Down);
-                        var down = seatingChart[downI, downJ];
+                        var down = previousSeatingChart[downI, downJ];
 
                         var (downLeftI, downLeftJ) = GetAdjacentCell(i, j, Direction.DownLeft);
-                        var downLeft = seatingChart[downLeftI, downLeftJ];
+                        var downLeft = previousSeatingChart[downLeftI, downLeftJ];
 
                         //if empty and all adjecent empty set full
-                        if (seatingChart[i, j] == Cell.Empty
+                        if (previousSeatingChart[i, j] == Cell.Empty
                             && left != Cell.Occupied
                             && upLeft != Cell.Occupied
                             && up != Cell.Occupied
@@ -312,8 +311,7 @@ namespace AdventOfCode2020
                         {
                             seatingChart[i, j] = Cell.Occupied;
                         }
-
-                        if (seatingChart[i, j] == Cell.Occupied)
+                        else if (previousSeatingChart[i, j] == Cell.Occupied)
                         {
                             var count = 0;
 
@@ -334,6 +332,18 @@ namespace AdventOfCode2020
                     }
                 }
             }
+
+            var finalCount = 0;
+            for (int i = 0; i < rowCount; i++)
+            {
+                for (int j = 0; j < colCount; j++)
+                {
+                    if (seatingChart[i, j] == Cell.Occupied)
+                        finalCount++;
+                }
+            }
+
+            Console.WriteLine(finalCount);
         }
 
         public static bool SeatingChartsAreEqual(int rowCount, int colCount, Cell[,] a, Cell[,] b)
@@ -360,40 +370,15 @@ namespace AdventOfCode2020
         {
             return direction switch
             {
-                Direction.Left => Tuple.Create(i - 1, j),
-                Direction.UpLeft => Tuple.Create(i - 1, j + 1),
-                Direction.Up => Tuple.Create(i, j + 1),
-                Direction.UpRight => Tuple.Create(i + 1, j + 1),
-                Direction.Right => Tuple.Create(i + 1, j),
-                Direction.DownRight => Tuple.Create(i + 1, j - 1),
-                Direction.Down => Tuple.Create(i, j - 1),
-                Direction.DownLeft => Tuple.Create(i - 1, j - 1)
+                Direction.Left => Tuple.Create(i, j - 1),
+                Direction.UpLeft => Tuple.Create(i - 1, j - 1),
+                Direction.Up => Tuple.Create(i - 1, j),
+                Direction.UpRight => Tuple.Create(i - 1, j + 1),
+                Direction.Right => Tuple.Create(i, j + 1),
+                Direction.DownRight => Tuple.Create(i + 1, j + 1),
+                Direction.Down => Tuple.Create(i + 1, j),
+                Direction.DownLeft => Tuple.Create(i + 1, j - 1)
             };
-        }
-
-        public void TestPrint(int rowCount, int colCount, Cell[,] seatingChart)
-        {
-            for (int i = 0; i < rowCount; i++)
-            {
-                for (int j = 0; j < colCount; j++)
-                {
-                    var currentCell = seatingChart[i, j];
-                    switch (currentCell)
-                    {
-                        case Cell.Floor:
-                            Console.Write(".");
-                            break;
-                        case Cell.Empty:
-                            Console.Write("L");
-                            break;
-                        case Cell.Occupied:
-                            Console.Write("#");
-                            break;
-                    }
-                }
-
-                Console.WriteLine();
-            }
         }
 
         public enum Cell
