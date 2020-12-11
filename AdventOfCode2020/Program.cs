@@ -13,8 +13,15 @@ namespace AdventOfCode2020
             using var fileStream = File.OpenRead(path);
             using var streamReader = new StreamReader(fileStream);
 
+            var data = new List<string>();
+            string line;
+            while ((line = streamReader.ReadLine()) != null)
+            {
+                data.Add(line);
+            }
+
             //currently working on:
-            Day10.Part1(streamReader);
+            Day11.Part1(data);
         }
     }
 
@@ -28,14 +35,13 @@ namespace AdventOfCode2020
 
     public class Day2
     {
-        public static void Part1(StreamReader streamReader)
+        public static void Part1(List<string> data)
         {
             var count = 0;
 
-            string line;
-            while ((line = streamReader.ReadLine()) != null)
+            foreach (var item in data)
             {
-                var tokens = line.Split(" ");
+                var tokens = item.Split(" ");
 
                 if (tokens.Length != 3)
                     throw new Exception("fucked");
@@ -133,20 +139,89 @@ namespace AdventOfCode2020
 
     public class Day10
     {
-        public static void Part1(StreamReader streamReader)
+        public static void Part1(List<string> data)
         {
-            var input = "16 10 15 5 1 11 7 19 6 12 4";
+            var adapters = new List<int>
+            {
+                0
+            };
 
-            var adapters = input.Split(" ");
+            foreach (var adapter in data)
+            {
+                adapters.Add(int.Parse(adapter));
+            }
 
+            adapters.Sort();
+
+            adapters.Add(adapters.Last() + 3);
+
+            var threeCount = 0;
+            var oneCount = 0;
+            for (var i = 0; i < adapters.Count - 1; i++)
+            {
+                if (adapters[i + 1] - adapters[i] == 3)
+                {
+                    threeCount++;
+                }
+                else if (adapters[i + 1] - adapters[i] == 1)
+                {
+                    oneCount++;
+                }
+            }
+
+            Console.WriteLine(threeCount * oneCount);
+        }
+
+        public void Part2(List<string> data)
+        {
+            var adapters = new List<int>
+            {
+                0
+            };
+
+            foreach (var adapter in data)
+            {
+                adapters.Add(int.Parse(adapter));
+            }
+
+            adapters.Sort();
+
+            adapters.Add(adapters.Last() + 3);
+
+            var total = 0;
+            var cache = new Dictionary<int, int>();
+
+            for (var i = adapters.Count - 1; i > 0; i--)
+            {
+                for (var j = 1; j < 4; j++)
+                {
+                    if (i + j >= adapters.Count)
+                        break;
+
+                    if (adapters[i + j] - adapters[i] > 3)
+                        break;
+
+                    if (cache.ContainsKey(i))
+                    {
+                        cache[i] = cache[i] + cache[i + j];
+                        break;
+                    }
+                    else
+                    {
+                        cache.Add(i, 1);
+                    }
+                }
+            }
+
+            Console.WriteLine(total);
         }
     }
 
     public class Day11
     {
-        public static void Part1()
+        public static void Part1(List<string> data)
         {
-            throw new NotImplementedException();
+
         }
     }
 
