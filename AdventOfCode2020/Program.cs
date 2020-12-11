@@ -221,7 +221,34 @@ namespace AdventOfCode2020
     {
         public static void Part1(List<string> data)
         {
+            var rowCount = data.Count;
+            var colCount = data.First().Length;
 
+            var seatingChart = new Cell[rowCount, colCount];
+
+            for (int i = 0; i < rowCount; i++)
+            {
+                var seats = data[i].ToArray();
+                for (int j = 0; j < colCount; j++)
+                {
+                    seatingChart[i, j] = (seats[j]) switch
+                    {
+                        '.' => Cell.Floor,
+                        'L' => Cell.Empty,
+                        '#' => Cell.Full,
+                        _ => throw new Exception("Invalid input"),
+                    };
+                }
+            }
+
+
+        }
+
+        public enum Cell
+        {
+            Floor = -1,
+            Empty = 0,
+            Full = 1
         }
     }
 
