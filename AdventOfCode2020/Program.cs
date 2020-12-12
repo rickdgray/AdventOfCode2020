@@ -21,7 +21,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Day1.Part1(data);
+            Day1.Part2(data);
         }
     }
 
@@ -44,6 +44,22 @@ namespace AdventOfCode2020
                     break;
                 }
             }    
+        }
+
+        public static void Part2(List<string> data)
+        {
+            var numbers = new List<int>();
+            foreach (var num in data)
+            {
+                numbers.Add(int.Parse(num));
+            }
+
+            for (int i = 0; i < numbers.Count; i++)
+                for (int j = i + 1; j < numbers.Count; j++)
+                    for (int k = j + 1; k < numbers.Count; k++)
+                        if (numbers[i] + numbers[j] + numbers[k] == 2020)
+                            Console.WriteLine(numbers[i] * numbers[j] * numbers[k]);
+
         }
     }
 
