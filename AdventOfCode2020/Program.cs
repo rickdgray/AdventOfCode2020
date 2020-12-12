@@ -441,7 +441,43 @@ namespace AdventOfCode2020
     {
         public static void Part1(List<string> data)
         {
-            throw new NotImplementedException();
+            double x = 0;
+            double y = 0;
+            double radians = 0;
+
+            foreach (var line in data)
+            {
+                var instruction = line.Substring(0, 1);
+                var distance = line.Substring(1);
+
+                switch(instruction)
+                {
+                    case "N":
+                        y += int.Parse(distance);
+                        break;
+                    case "S":
+                        y -= int.Parse(distance);
+                        break;
+                    case "E":
+                        x += int.Parse(distance);
+                        break;
+                    case "W":
+                        x -= int.Parse(distance);
+                        break;
+                    case "L":
+                        radians += int.Parse(distance) * Math.PI / 180;
+                        break;
+                    case "R":
+                        radians -= int.Parse(distance) * Math.PI / 180;
+                        break;
+                    case "F":
+                        x += int.Parse(distance) * Math.Cos(radians);
+                        y += int.Parse(distance) * Math.Sin(radians);
+                        break;
+                }
+            }
+
+            Console.WriteLine(Math.Abs(x) + Math.Abs(y));
         }
     }
 
