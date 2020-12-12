@@ -21,7 +21,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Day1.Part2(data);
+            Day3.Part1(data);
         }
     }
 
@@ -98,13 +98,35 @@ namespace AdventOfCode2020
                 {
                     var numberOfInstances = concordance[policyLetter];
 
-                    if (numberOfInstances < policyMinimumNumber || numberOfInstances > policyMaximumNumber)
+                    if (numberOfInstances >= policyMinimumNumber && numberOfInstances <= policyMaximumNumber)
                         count++;
                 }
-                else
-                {
+            }
+
+            Console.WriteLine(count);
+        }
+
+        public static void Part2(List<string> data)
+        {
+            var count = 0;
+
+            foreach (var item in data)
+            {
+                var tokens = item.Split(" ");
+
+                if (tokens.Length != 3)
+                    throw new Exception("fucked");
+
+                var positions = tokens[0].Split("-");
+
+                var letter = tokens[1].ToCharArray().First();
+                var password = tokens[2];
+
+                var firstLetterMatches = password.ElementAt(int.Parse(positions[0]) - 1).Equals(letter);
+                var secondLetterMatches = password.ElementAt(int.Parse(positions[1]) - 1).Equals(letter);
+
+                if (firstLetterMatches ^ secondLetterMatches)
                     count++;
-                }
             }
 
             Console.WriteLine(count);
@@ -113,9 +135,9 @@ namespace AdventOfCode2020
 
     public class Day3
     {
-        public static void Part1()
+        public static void Part1(List<string> data)
         {
-            throw new NotImplementedException();
+
         }
     }
 
