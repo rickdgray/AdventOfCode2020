@@ -21,15 +21,29 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Day13.Part1(data);
+            Day1.Part1(data);
         }
     }
 
     public class Day1
     {
-        public static void Part1()
+        public static void Part1(List<string> data)
         {
-            throw new NotImplementedException();
+            var complementLookup = new Dictionary<int, int>();
+            foreach (var num in data)
+            {
+                var numAsInt = int.Parse(num);
+                complementLookup.Add(numAsInt, 2020 - numAsInt);
+            }
+
+            foreach (var (num, comp) in complementLookup)
+            {
+                if (complementLookup.ContainsKey(comp))
+                {
+                    Console.WriteLine(num * comp);
+                    break;
+                }
+            }    
         }
     }
 
