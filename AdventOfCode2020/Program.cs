@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace AdventOfCode2020
 {
@@ -21,7 +22,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Day14.Part2(data);
+            Day15.Part1(data);
         }
     }
 
@@ -686,13 +687,13 @@ namespace AdventOfCode2020
                 }
             }
 
-            var count = 0L;
+            var total = 0L;
             foreach (var (add, val) in mem)
             {
-                count += val;
+                total += val;
             }
 
-            Console.WriteLine(count);
+            Console.WriteLine(total);
         }
 
         public static void Part2(List<string> data)
@@ -711,43 +712,85 @@ namespace AdventOfCode2020
                 else
                 {
                     //I am not proud of this
-                    var address = long.Parse(instruction.Split("[")[1].Split("]")[0]);
+                    var addressToMask = Convert.ToString(long.Parse(instruction.Split("[")[1].Split("]")[0]), 2).PadLeft(36, '0');
 
-                    var addressToMask = Convert.ToString(address, 2).PadLeft(36, '0');
-
-                    for (int i = 0; i < mask.Length; i++)
+                    var stringBuilderList = new List<StringBuilder>
+                    {
+                        new StringBuilder(36)
+                    };
+                    for (int i = 0; i < 36; i++)
                     {
                         switch (mask[i])
                         {
+                            case '0':
+                                {
+                                    foreach (var stringBuilder in stringBuilderList)
+                                    {
+                                        stringBuilder.Append(addressToMask[i]);
+                                    }
+                                    break;
+                                }
                             case '1':
-                                addressToMask = addressToMask.Remove(i, 1).Insert(i, "1");
-                                break;
+                                {
+                                    foreach (var stringBuilder in stringBuilderList)
+                                    {
+                                        stringBuilder.Append('1');
+                                    }
+                                    break;
+                                }
                             case 'X':
-                                addressToMask = addressToMask.Remove(i, 1).Insert(i, "X");
-                                break;
-                            default:
-                                break;
+                                {
+                                    var stringBuilderListCount = stringBuilderList.Count;
+                                    //make copies of all current
+                                    for (int j = 0; j < stringBuilderListCount; j++)
+                                    {
+                                        stringBuilderList.Add(new StringBuilder(stringBuilderList[j].ToString(), 36));
+                                    }
+
+                                    //first half get 0 appended
+                                    for (int j = 0; j < stringBuilderListCount; j++)
+                                    {
+                                        stringBuilderList[j].Append('0');
+                                    }
+
+                                    //second half get 1 appended
+                                    for (int j = stringBuilderListCount; j < stringBuilderList.Count; j++)
+                                    {
+                                        stringBuilderList[j].Append('1');
+                                    }
+
+                                    break;
+                                }
                         }
                     }
 
-                    if (mem.ContainsKey(address))
+                    var addresses = new List<long>();
+                    foreach (var stringBuilder in stringBuilderList)
                     {
-                        mem[address] = Convert.ToInt64(addressToMask, 2);
+                        addresses.Add(Convert.ToInt64(stringBuilder.ToString(), 2));
                     }
-                    else
+
+                    foreach (var address in addresses)
                     {
-                        mem.Add(address, Convert.ToInt64(addressToMask, 2));
+                        if (mem.ContainsKey(address))
+                        {
+                            mem[address] = long.Parse(value);
+                        }
+                        else
+                        {
+                            mem.Add(address, long.Parse(value));
+                        }
                     }
                 }
             }
 
-            var count = 0L;
+            var total = 0L;
             foreach (var (add, val) in mem)
             {
-                count += val;
+                total += val;
             }
 
-            Console.WriteLine(count);
+            Console.WriteLine(total);
         }
     }
 
