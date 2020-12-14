@@ -21,7 +21,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Day3.Part1(data);
+            Day14.Part1(data);
         }
     }
 
@@ -143,9 +143,9 @@ namespace AdventOfCode2020
 
     public class Day4
     {
-        public static void Part1()
+        public static void Part1(List<string> data)
         {
-            throw new NotImplementedException();
+
         }
     }
 
@@ -640,9 +640,9 @@ namespace AdventOfCode2020
 
     public class Day14
     {
-        public static void Part1()
+        public static void Part1(List<string> data)
         {
-            throw new NotImplementedException();
+
         }
     }
 
