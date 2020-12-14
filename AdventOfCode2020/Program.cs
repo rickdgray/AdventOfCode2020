@@ -642,7 +642,57 @@ namespace AdventOfCode2020
     {
         public static void Part1(List<string> data)
         {
+            var mask = string.Empty;
+            var mem = new Dictionary<long, long>();
+            foreach (var line in data)
+            {
+                var instruction = line.Split(" ")[0];
+                var value = line.Split(" ")[2];
 
+                if (instruction.Substring(0, 4).Equals("mask"))
+                {
+                    mask = value;
+                }
+                else
+                {
+                    //I am not proud of this
+                    var address = long.Parse(instruction.Split("[")[1].Split("]")[0]);
+
+                    var valueToMask = Convert.ToString(long.Parse(value), 2).PadLeft(36, '0');
+
+                    for (int i = 0; i < mask.Length; i++)
+                    {
+                        switch (mask[i])
+                        {
+                            case '0':
+                                valueToMask = valueToMask.Remove(i, 1).Insert(i, "0");
+                                break;
+                            case '1':
+                                valueToMask = valueToMask.Remove(i, 1).Insert(i, "1");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    if (mem.ContainsKey(address))
+                    {
+                        mem[address] = Convert.ToInt64(valueToMask, 2);
+                    }
+                    else
+                    {
+                        mem.Add(address, Convert.ToInt64(valueToMask, 2));
+                    }
+                }
+            }
+
+            var count = 0L;
+            foreach (var (add, val) in mem)
+            {
+                count += val;
+            }
+
+            Console.WriteLine(count);
         }
     }
 
