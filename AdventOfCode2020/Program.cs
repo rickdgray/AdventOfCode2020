@@ -21,7 +21,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Day14.Part1(data);
+            Day14.Part2(data);
         }
     }
 
@@ -682,6 +682,61 @@ namespace AdventOfCode2020
                     else
                     {
                         mem.Add(address, Convert.ToInt64(valueToMask, 2));
+                    }
+                }
+            }
+
+            var count = 0L;
+            foreach (var (add, val) in mem)
+            {
+                count += val;
+            }
+
+            Console.WriteLine(count);
+        }
+
+        public static void Part2(List<string> data)
+        {
+            var mask = string.Empty;
+            var mem = new Dictionary<long, long>();
+            foreach (var line in data)
+            {
+                var instruction = line.Split(" ")[0];
+                var value = line.Split(" ")[2];
+
+                if (instruction.Substring(0, 4).Equals("mask"))
+                {
+                    mask = value;
+                }
+                else
+                {
+                    //I am not proud of this
+                    var address = long.Parse(instruction.Split("[")[1].Split("]")[0]);
+
+                    var addressToMask = Convert.ToString(address, 2).PadLeft(36, '0');
+
+                    for (int i = 0; i < mask.Length; i++)
+                    {
+                        switch (mask[i])
+                        {
+                            case '1':
+                                addressToMask = addressToMask.Remove(i, 1).Insert(i, "1");
+                                break;
+                            case 'X':
+                                addressToMask = addressToMask.Remove(i, 1).Insert(i, "X");
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    if (mem.ContainsKey(address))
+                    {
+                        mem[address] = Convert.ToInt64(addressToMask, 2);
+                    }
+                    else
+                    {
+                        mem.Add(address, Convert.ToInt64(addressToMask, 2));
                     }
                 }
             }
