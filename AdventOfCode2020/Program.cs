@@ -10,7 +10,8 @@ namespace AdventOfCode2020
     {
         static void Main()
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "input.txt");
+            var workingDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
+            var path = Path.Combine(workingDirectory.Parent.Parent.Parent.FullName, "Data", "day14.txt");
             using var fileStream = File.OpenRead(path);
             using var streamReader = new StreamReader(fileStream);
 
@@ -22,7 +23,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Day15.Part1(data);
+            Day14.Part1(data);
         }
     }
 
@@ -796,7 +797,7 @@ namespace AdventOfCode2020
 
     public class Day15
     {
-        public static void Part1()
+        public static void Part1(List<string> data)
         {
             throw new NotImplementedException();
         }
