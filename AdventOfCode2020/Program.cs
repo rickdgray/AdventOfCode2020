@@ -9,7 +9,7 @@ namespace AdventOfCode2020
         static void Main()
         {
             var workingDirectory = new DirectoryInfo(Directory.GetCurrentDirectory());
-            var path = Path.Combine(workingDirectory.Parent.Parent.Parent.FullName, "Data", "day4.txt");
+            var path = Path.Combine(workingDirectory.Parent.Parent.Parent.FullName, "Data", "day15.txt");
             using var fileStream = File.OpenRead(path);
             using var streamReader = new StreamReader(fileStream);
 
@@ -21,7 +21,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Console.WriteLine(Day4.Part1(data));
+            Console.WriteLine(Day15.Part1(data));
         }
     }
 }
