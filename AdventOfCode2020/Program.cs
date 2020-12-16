@@ -21,7 +21,7 @@ namespace AdventOfCode2020
             }
 
             //currently working on:
-            Console.WriteLine(Day15.Part1(data));
+            Console.WriteLine(Day15.Part2(data));
         }
     }
 }
