@@ -55,53 +55,26 @@ namespace AdventOfCode2020
             var largestBus = busPositions.Keys.Max();
             var positionOfLargestBus = busPositions[busPositions.Keys.Max()];
 
-            //calculate the offset of the others to the largest
-            var offsets = new Dictionary<int, int>();
+            //calculate offset then separate by if the offset is equal to itself
+            var busesWithRemainderZero = new List<int>();
+            var busesWithOtherRemainders = new Dictionary<int, int>();
             foreach (var (bus, position) in busPositions)
             {
                 if (bus == largestBus)
                     continue;
 
-                if (position < positionOfLargestBus)
-                {
-                    offsets.Add(bus, positionOfLargestBus - position);
-                }
-                else
-                {
-                    offsets.Add(bus, position - positionOfLargestBus);
-                }
-            }
-
-            //separate by if the offset is equal to itself
-            var busesWithRemainderZero = new List<int>();
-            var busesWithOtherRemainders = new Dictionary<int, int>();
-            foreach (var (bus, offset) in offsets)
-            {
-                if (bus == offset)
+                if (bus == Math.Abs(positionOfLargestBus - position))
                     busesWithRemainderZero.Add(bus);
                 else
-                {
-                    //if it appears after reference point, set to negative just to keep track
-                    if (offset < positionOfLargestBus)
-                        busesWithOtherRemainders.Add(bus, offset);
-                    else
-                        busesWithOtherRemainders.Add(bus, -1 * offset);
-                }
+                    busesWithOtherRemainders.Add(bus, positionOfLargestBus - position);
             }
 
             //all buses with offset equal to itself are just multiplied to the largest number
             var startingNumber = busesWithRemainderZero.Aggregate(largestBus, (total, next) => total * next);
-
-            //start searching and increment by that number
-            long current = startingNumber;
-            while (true)
+            for (long current = startingNumber; true; current += startingNumber)
             {
-                //check the rest of the buses for remainder
-                //if they appear after largest, need to add the difference to the current
-                if (busesWithOtherRemainders.All(b => b.Value > 0 ? current % b.Key == b.Value : (current - b.Value) % b.Key == 0))
-                    return current - positionOfLargestBus; //subtract out the offset to the first number since that's what we're actually searching for
-
-                current += startingNumber;
+                if (busesWithOtherRemainders.All(b => (current - b.Value) % b.Key == 0))
+                    return current - positionOfLargestBus;
             }
         }
     }
