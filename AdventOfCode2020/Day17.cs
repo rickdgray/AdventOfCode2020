@@ -185,22 +185,6 @@ namespace AdventOfCode2020
             return finalCount;
         }
 
-        public static void TestPrint(int rowCount, int colCount, int layCount, Cell[,,] dim)
-        {
-            for (int k = 0; k < layCount; k++)
-            {
-                Console.WriteLine($"Layer {k}:");
-                for (int i = 0; i < rowCount; i++)
-                {
-                    for (int j = 0; j < colCount; j++)
-                    {
-                        Console.Write(dim[i, j, k] == Cell.Active ? "#" : ".");
-                    }
-                    Console.WriteLine();
-                }
-            }
-        }
-
         public static Tuple<int, int, int> GetAdjacentCell(int i, int j, int k, Direction direction)
         {
             return direction switch
