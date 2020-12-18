@@ -8,7 +8,7 @@ namespace AdventOfCode2020
     {
         public static long Part1(List<string> data)
         {
-            var rules = new Dictionary<string, string>();
+            var rules = new Dictionary<string, Tuple<Tuple<int, int>, Tuple<int, int>>>();
             var myTicket = new List<int>();
             var nearbyTickets = new List<List<int>>();
 
@@ -24,7 +24,13 @@ namespace AdventOfCode2020
                 }
 
                 var rule = line.Split(": ");
-                rules.Add(rule[0], rule[1]);
+                var ruleTokens = rule[1].Split(" or ");
+                var firstRule = ruleTokens[0].Split("-");
+                var secondRule = ruleTokens[1].Split("-");
+
+                rules.Add(rule[0], Tuple.Create(
+                    Tuple.Create(int.Parse(firstRule[0]), int.Parse(firstRule[1])),
+                    Tuple.Create(int.Parse(secondRule[0]), int.Parse(secondRule[1]))));
             }
             lineNumber += 2;
             myTicket.AddRange(data[lineNumber].Split(",").Select(n => int.Parse(n)).ToList());
@@ -43,21 +49,13 @@ namespace AdventOfCode2020
             }
 
             var invalidFields = new List<int>();
-            var bounds = new List<Tuple<Tuple<int, int>, Tuple<int, int>>>();
-            foreach (var (_, rule) in rules)
-            {
-                var ruleTokens = rule.Split(" or ");
-                var firstRule = ruleTokens[0].Split("-");
-                var secondRule = ruleTokens[1].Split("-");
-
-                bounds.Add(Tuple.Create(Tuple.Create(int.Parse(firstRule[0]), int.Parse(firstRule[1])), Tuple.Create(int.Parse(secondRule[0]), int.Parse(secondRule[1]))));
-            }
-
             foreach (var nearbyTicket in nearbyTickets)
             {
                 foreach (var field in nearbyTicket)
                 {
-                    if (bounds.All(b => field < b.Item1.Item1 || (field > b.Item1.Item2 && field < b.Item2.Item1) || field > b.Item2.Item2))
+                    if (rules.All(r => field < r.Value.Item1.Item1
+                        || (field > r.Value.Item1.Item2 && field < r.Value.Item2.Item1)
+                        || field > r.Value.Item2.Item2))
                     {
                         invalidFields.Add(field);
                     }
@@ -69,7 +67,7 @@ namespace AdventOfCode2020
 
         public static long Part2(List<string> data)
         {
-            var rules = new Dictionary<string, string>();
+            var rulesLookup = new Dictionary<string, Tuple<Tuple<int, int>, Tuple<int, int>>>();
             var myTicket = new List<int>();
             var nearbyTickets = new List<List<int>>();
 
@@ -85,7 +83,13 @@ namespace AdventOfCode2020
                 }
 
                 var rule = line.Split(": ");
-                rules.Add(rule[0], rule[1]);
+                var ruleTokens = rule[1].Split(" or ");
+                var firstRule = ruleTokens[0].Split("-");
+                var secondRule = ruleTokens[1].Split("-");
+
+                rulesLookup.Add(rule[0], Tuple.Create(
+                    Tuple.Create(int.Parse(firstRule[0]), int.Parse(firstRule[1])),
+                    Tuple.Create(int.Parse(secondRule[0]), int.Parse(secondRule[1]))));
             }
             lineNumber += 2;
             myTicket.AddRange(data[lineNumber].Split(",").Select(n => int.Parse(n)).ToList());
@@ -103,26 +107,59 @@ namespace AdventOfCode2020
                 nearbyTickets.Last().AddRange(data[i].Split(",").Select(n => int.Parse(n)).ToList());
             }
 
-            var bounds = new List<Tuple<Tuple<int, int>, Tuple<int, int>>>();
-            foreach (var (_, rule) in rules)
-            {
-                var ruleTokens = rule.Split(" or ");
-                var firstRule = ruleTokens[0].Split("-");
-                var secondRule = ruleTokens[1].Split("-");
-
-                bounds.Add(Tuple.Create(Tuple.Create(int.Parse(firstRule[0]), int.Parse(firstRule[1])), Tuple.Create(int.Parse(secondRule[0]), int.Parse(secondRule[1]))));
-            }
-
             for (int i = 0; i < nearbyTickets.Count; i++)
             {
                 foreach (var field in nearbyTickets[i])
                 {
-                    if (bounds.All(b => field < b.Item1.Item1 || (field > b.Item1.Item2 && field < b.Item2.Item1) || field > b.Item2.Item2))
+                    if (rulesLookup.All(r => field < r.Value.Item1.Item1
+                        || (field > r.Value.Item1.Item2 && field < r.Value.Item2.Item1)
+                        || field > r.Value.Item2.Item2))
                     {
-                        nearbyTickets.RemoveAt(i);
+                        nearbyTickets[i] = null;
+                        break;
                     }
                 }
             }
+            nearbyTickets.RemoveAll(t => t == null);
+
+            var availableRules = new List<string>(rulesLookup.Keys.ToList());
+            var columnAssignments = new Dictionary<string, int>();
+            for (int i = 0; i < nearbyTickets.First().Count; i++)
+            {
+                var matchingRules = new List<string>(availableRules);
+                foreach (var ticket in nearbyTickets)
+                {
+                    foreach (var ruleName in matchingRules.ToList())
+                    {
+                        var rule = rulesLookup[ruleName];
+
+                        if (ticket[i] < rule.Item1.Item1
+                            || (ticket[i] > rule.Item1.Item2 && ticket[i] < rule.Item2.Item1)
+                            || ticket[i] > rule.Item2.Item2)
+                        {
+                            if (matchingRules.Contains(ruleName))
+                                matchingRules.Remove(ruleName);
+                        }
+
+                        if (matchingRules.Count == 1)
+                            break;
+                    }
+
+                    if (matchingRules.Count == 1)
+                        break;
+                }
+
+                if (matchingRules.Count != 1)
+                    throw new Exception("Multiple possibilities; need to use process of elimination");
+
+                columnAssignments.Add(matchingRules.First(), i);
+                availableRules.Remove(matchingRules.First());
+
+                if (availableRules.Count == 1)
+
+            }
+
+            return -1;
         }
     }
 }
