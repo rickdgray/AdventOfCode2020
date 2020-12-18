@@ -122,44 +122,59 @@ namespace AdventOfCode2020
             }
             nearbyTickets.RemoveAll(t => t == null);
 
+            var availableColumns = Enumerable.Range(0, nearbyTickets.First().Count).ToList();
             var availableRules = new List<string>(rulesLookup.Keys.ToList());
             var columnAssignments = new Dictionary<string, int>();
-            for (int i = 0; i < nearbyTickets.First().Count; i++)
+            while (columnAssignments.Count < rulesLookup.Count)
             {
-                var matchingRules = new List<string>(availableRules);
-                foreach (var ticket in nearbyTickets)
+                foreach (var i in availableColumns.ToList())
                 {
-                    foreach (var ruleName in matchingRules.ToList())
+                    var matchingRules = new List<string>(availableRules);
+                    foreach (var ticket in nearbyTickets)
                     {
-                        var rule = rulesLookup[ruleName];
-
-                        if (ticket[i] < rule.Item1.Item1
-                            || (ticket[i] > rule.Item1.Item2 && ticket[i] < rule.Item2.Item1)
-                            || ticket[i] > rule.Item2.Item2)
+                        foreach (var ruleName in matchingRules.ToList())
                         {
-                            if (matchingRules.Contains(ruleName))
-                                matchingRules.Remove(ruleName);
+                            var rule = rulesLookup[ruleName];
+
+                            if (ticket[i] < rule.Item1.Item1
+                                || (ticket[i] > rule.Item1.Item2 && ticket[i] < rule.Item2.Item1)
+                                || ticket[i] > rule.Item2.Item2)
+                            {
+                                if (matchingRules.Contains(ruleName))
+                                    matchingRules.Remove(ruleName);
+                            }
+
+                            if (matchingRules.Count == 1)
+                                break;
                         }
 
                         if (matchingRules.Count == 1)
                             break;
                     }
 
-                    if (matchingRules.Count == 1)
+                    if (matchingRules.Count != 1)
+                        continue;
+
+                    columnAssignments.Add(matchingRules.First(), i);
+                    availableColumns.Remove(i);
+                    availableRules.Remove(matchingRules.First());
+
+                    if (availableRules.Count == 1)
+                    {
+                        columnAssignments.Add(availableRules.First(), i + 1);
                         break;
+                    }
                 }
-
-                if (matchingRules.Count != 1)
-                    throw new Exception("Multiple possibilities; need to use process of elimination");
-
-                columnAssignments.Add(matchingRules.First(), i);
-                availableRules.Remove(matchingRules.First());
-
-                if (availableRules.Count == 1)
-
             }
 
-            return -1;
+            var total = 1L;
+            foreach (var (name, column) in columnAssignments)
+            {
+                if (name.Length > 8 && name.Substring(0, 9).Equals("departure"))
+                    total *= myTicket[column];
+            }
+
+            return total;
         }
     }
 }
